@@ -11,18 +11,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bxl.config.editor.BXLConfigLoader
 import com.google.android.material.imageview.ShapeableImageView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 
 
@@ -43,10 +40,13 @@ class ConnectBluetoothFragment : DialogFragment() {
     private lateinit var _switchEnableBluetooth : SwitchCompat
     private lateinit var _imgClose : ShapeableImageView
     private lateinit var _pbBluetoothSearchForDevices : ShapeableImageView
+    private lateinit var _progressBarDialog : ProgressBar
 
 
     private lateinit var _mBluetoothAdapter : BluetoothAdapter
     private var _mRegistered = false
+    private var _logicalName = ""
+    private val _portType = BXLConfigLoader.DEVICE_BUS_BLUETOOTH
 
 
     companion object{
@@ -91,30 +91,64 @@ class ConnectBluetoothFragment : DialogFragment() {
         _rvPairedDevices = findViewById(R.id.rvBluetoothPairedDevices)
         _rvAvailableDevices = findViewById(R.id.rvBluetoothAvailableDevices)
 
-        _pbBluetoothSearchForDevices
+        _progressBarDialog = findViewById(R.id.progressBarDialog)
+
         _rvPairedDevices.adapter = _adapterPairedDevice
         _rvAvailableDevices.adapter = _adapterAvailableDevice
 
         _adapterPairedDevice.onClickItem = {
-            stopDiscovery()
-            action.action(it)
-            dismiss()
+            _progressBarDialog.visibility = View.VISIBLE
+            checkTypes(it)
         }
 
         _adapterAvailableDevice.onClickItem = {
-            stopDiscovery()
-            action.action(it)
-            dismiss()
+            _progressBarDialog.visibility = View.VISIBLE
+            checkTypes(it)
         }
 
-//        _adapterAvailableDevice.onClickItem = {device ->
-//            stopDiscovery()
-//            handleDeviceSelected(device){
-//                action.action(device)
-//                dismiss()
-//            }
-//        }
+
+        val modelList = findViewById<Spinner>(R.id.spinnerModelList)
+
+        val modelAdapter: ArrayAdapter<*> = ArrayAdapter.createFromResource(context, R.array.modelList, android.R.layout.simple_spinner_dropdown_item)
+        modelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        modelList.adapter = modelAdapter
+        modelList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                _logicalName = parent.getItemAtPosition(position) as String
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+
     }
+
+
+
+    private fun checkTypes(device: BluetoothDevice) {
+       MainScope().launch(Dispatchers.IO) {
+           if (_logicalName.isEmpty()){
+               MainScope().launch(Dispatchers.Main) {
+                   _progressBarDialog.visibility = View.GONE
+                   Toast.makeText(context , "Please select a type of printer", Toast.LENGTH_SHORT).show()
+               }
+           }else if (MainActivity.getPrinterInstance()?.printerOpen(_portType, _logicalName, device.address, true) == true){
+               MainScope().launch(Dispatchers.Main) {
+                   _progressBarDialog.visibility = View.GONE
+                   stopDiscovery()
+                   action.action(device)
+                   dismiss()
+               }
+           }else{
+               MainScope().launch(Dispatchers.Main) {
+                   _progressBarDialog.visibility = View.GONE
+                   Toast.makeText(context , "You can't connect printer, please try again.", Toast.LENGTH_SHORT).show()
+               }
+           }
+       }
+    }
+
+
 
     private fun clickableActions() {
         _imgClose.setOnClickListener {dismiss()}

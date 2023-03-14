@@ -2,4 +2,14 @@
     <string name="app_name">Connect Bluetooth</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="Text">Text</string>
+    <string name="Image">Image</string>
+    <string name="Barcode">Barcode</string>
+    <string name="PageMode">Page Mode</string>
+    <string name="DirectIO">Direct I/O</string>
+    <string name="MSR">MSR</string>
+    <string name="SCR">SCR</string>
+    <string name="CashDrawer">Cash Drawer</string>
+    <string name="ETC">Etc.</string>
 </resources>

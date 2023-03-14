@@ -7,6 +7,7 @@
     tools:context=".ConnectBluetoothFragment">
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/materialCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -23,33 +24,32 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:background="@android:color/holo_blue_dark"
-                android:paddingHorizontal="15dp"
-                android:paddingVertical="5dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:background="@android:color/holo_blue_dark"
                 android:gravity="center"
-                android:layout_height="wrap_content">
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="5dp">
 
                 <TextView
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="@color/white"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="Choose bluetooth device"/>
+                    android:layout_weight="1"
+                    android:text="Choose bluetooth device"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:layout_width="40dp"
                     android:id="@+id/imgClose"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:padding="4dp"
                     android:src="@drawable/baseline_close_24"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
+                    app:layout_constraintTop_toTopOf="parent" />
 
 
             </LinearLayout>
@@ -58,80 +58,110 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginTop="5dp"
+                android:gravity="center"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvBluetoothName"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="7dp"
                     android:layout_height="wrap_content"
-                    android:text=" bluetooth name"/>
+                    android:layout_marginStart="7dp"
+                    android:layout_weight="1"
+                    android:text="Bluetooth name"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/switchEnableBluetooth"
                     android:layout_width="wrap_content"
-                    android:checked="true"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
+                    android:checked="true"
                     android:thumb="@drawable/swith_button_thumb_1"
                     app:track="@drawable/switch_button_track" />
 
             </LinearLayout>
 
-            <TextView
-                android:padding="10dp"
-                android:textStyle="bold"
-                android:layout_marginTop="10dp"
-                android:background="#06A816"
-                android:textSize="16sp"
-                android:textColor="@color/white"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Paired devices"/>
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textViewModel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_weight="0.5"
+                    android:text="Printer Model : "
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerModelList"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="#06A816"
+                android:padding="10dp"
+                android:text="Paired devices"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvBluetoothPairedDevices"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
-                tools:listitem="@layout/item_rv_bluetooth_device"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                tools:listitem="@layout/item_rv_bluetooth_device" />
 
             <TextView
                 android:id="@+id/tvNoPairedDevices"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:padding="20dp"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:text=" NO PAIRED DEVICES"
                 android:textAlignment="center"
                 android:textColor="#B31B1B"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:visibility="gone"
-                tools:visibility="visible"
-                android:layout_height="wrap_content"
-                android:text=" NO PAIRED DEVICES"/>
+                tools:visibility="visible" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:background="#FF9800"
-                android:layout_marginTop="10dp"
-                android:paddingHorizontal="10dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="#FF9800"
                 android:gravity="center"
-                android:layout_height="wrap_content">
+                android:paddingHorizontal="10dp">
 
                 <TextView
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:layout_weight="1"
-                    android:textColor="@color/white"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Available devices"/>
+                    android:layout_weight="1"
+                    android:text="Available devices"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
 
                 <com.google.android.material.imageview.ShapeableImageView
@@ -139,13 +169,12 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@color/white"
-                    app:contentPadding="4dp"
                     android:padding="4dp"
                     android:src="@drawable/reload2"
+                    app:contentPadding="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
+                    app:layout_constraintTop_toTopOf="parent" />
 
 
             </LinearLayout>
@@ -155,25 +184,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
-                tools:listitem="@layout/item_rv_bluetooth_device"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                tools:listitem="@layout/item_rv_bluetooth_device" />
 
             <TextView
                 android:id="@+id/tvNoAvailableDevices"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:padding="20dp"
                 android:layout_width="match_parent"
-                android:textAlignment="center"
-                android:visibility="gone"
-                tools:visibility="visible"
-                android:textColor="#B31B1B"
                 android:layout_height="wrap_content"
-                android:text=" NO Available DEVICES"/>
+                android:padding="20dp"
+                android:text=" NO Available DEVICES"
+                android:textAlignment="center"
+                android:textColor="#B31B1B"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
         </LinearLayout>
 
 
     </com.google.android.material.card.MaterialCardView>
+
+    <ProgressBar
+        android:id="@+id/progressBarDialog"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:elevation="2dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:indeterminateTint="#FF9800"
+        app:layout_constraintBottom_toBottomOf="@+id/materialCardView"
+        app:layout_constraintEnd_toEndOf="@+id/materialCardView"
+        app:layout_constraintStart_toStartOf="@+id/materialCardView"
+        app:layout_constraintTop_toTopOf="@+id/materialCardView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

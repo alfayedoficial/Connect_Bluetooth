@@ -31,6 +31,10 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    packagingOptions {
+        exclude 'META-INF/REFACTORINGS.XML'
+    }
 }
 
 dependencies {
@@ -47,11 +51,17 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation files('libs/printer_library.jar')
-    implementation files('libs/achartengine-1.2.0.jar')
-    implementation files('libs/bixolon_printer_v130.jar')
-    implementation files('libs/jpos118-controls.jar')
-    implementation files('libs/xerces.jar')
+
+    implementation project(path: ':bixolon_pdf')
+
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.7'
+
+
+    implementation "com.google.android.exoplayer:exoplayer-core:2.16.1"
+    implementation "com.google.android.exoplayer:exoplayer-hls:2.16.1"
+
+
+
 }
