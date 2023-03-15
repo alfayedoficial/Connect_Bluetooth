@@ -159,7 +159,7 @@ public class TextFragment extends Fragment implements OnClickListener {
                     attribute |= BixolonPrinter.ATTRIBUTE_REVERSE;
                 }
 
-                MainActivity.getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
+                MainActivityJava.getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
                 break;
         }
     }

@@ -160,7 +160,7 @@ public class ImageFragment extends Fragment implements View.OnClickListener, See
                 break;
 
             case R.id.buttonGetWidth:
-                width = MainActivity.getPrinterInstance().getPrinterMaxWidth();
+                width = MainActivityJava.getPrinterInstance().getPrinterMaxWidth();
                 editTextWidth.setText(Integer.toString(width));
                 break;
 
@@ -191,7 +191,7 @@ public class ImageFragment extends Fragment implements View.OnClickListener, See
 
                 switch (radioGroupPrintingType.getCheckedRadioButtonId()) {
                     case R.id.radioImage:
-                        MainActivity.getPrinterInstance().printImage(strPath, width, alignment, brightness, spinnerDither, spinnerCompress);
+                        MainActivityJava.getPrinterInstance().printImage(strPath, width, alignment, brightness, spinnerDither, spinnerCompress);
                         break;
 
                     case R.id.radioPDF:
@@ -211,7 +211,7 @@ public class ImageFragment extends Fragment implements View.OnClickListener, See
                             } else if (endPage > totalPages || startPage > totalPages) {
                                 Toast.makeText(getContext(), "check the endpage", Toast.LENGTH_SHORT).show();
                             } else {
-                                MainActivity.getPrinterInstance().printPdf(uri, width, alignment, startPage, endPage, brightness, spinnerDither, spinnerCompress);
+                                MainActivityJava.getPrinterInstance().printPdf(uri, width, alignment, startPage, endPage, brightness, spinnerDither, spinnerCompress);
                             }
                         }
                         break;

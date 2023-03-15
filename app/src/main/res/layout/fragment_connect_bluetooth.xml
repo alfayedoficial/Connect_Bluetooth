@@ -205,6 +205,17 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="2dp"
+        android:alpha="0.5"
+        android:visibility="gone"
+        android:clickable="false"
+        android:id="@+id/viewDialog"
+        tools:visibility="visible"
+        android:background="@color/black"/>
+
     <ProgressBar
         android:id="@+id/progressBarDialog"
         android:layout_width="60dp"
@@ -212,6 +223,7 @@
         android:elevation="2dp"
         android:visibility="gone"
         tools:visibility="visible"
+        android:clickable="false"
         android:indeterminateTint="#FF9800"
         app:layout_constraintBottom_toBottomOf="@+id/materialCardView"
         app:layout_constraintEnd_toEndOf="@+id/materialCardView"

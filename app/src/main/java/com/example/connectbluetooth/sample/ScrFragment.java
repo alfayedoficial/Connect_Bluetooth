@@ -53,19 +53,19 @@ public class ScrFragment extends Fragment implements View.OnClickListener, Radio
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.buttonSCROpen:
-                if (MainActivity.getPrinterInstance().smartCardRWOpen()) {
+                if (MainActivityJava.getPrinterInstance().smartCardRWOpen()) {
                     setSCSlot(radioGroupSCSlot.getCheckedRadioButtonId());
                     setSCMode(radioGroupSCMode.getCheckedRadioButtonId());
                 }
                 break;
             case R.id.buttonSCRClose:
-                MainActivity.getPrinterInstance().smartCardRWClose();
+                MainActivityJava.getPrinterInstance().smartCardRWClose();
                 break;
             case R.id.buttonSCRPowerUp:
-                MainActivity.getPrinterInstance().SCPowerUp(5000);
+                MainActivityJava.getPrinterInstance().SCPowerUp(5000);
                 break;
             case R.id.buttonSCRPowerDown:
-                MainActivity.getPrinterInstance().SCPowerDown(5000);
+                MainActivityJava.getPrinterInstance().SCPowerDown(5000);
                 break;
             case R.id.buttonSCRRead:
                 try {
@@ -76,7 +76,7 @@ public class ScrFragment extends Fragment implements View.OnClickListener, Radio
                     };
                     int[] count = new int[1];
 
-                    if (MainActivity.getPrinterInstance().SCRead(data, count)) {
+                    if (MainActivityJava.getPrinterInstance().SCRead(data, count)) {
                         Toast.makeText(getContext(), hexToString(data[0].getBytes("CP437")), Toast.LENGTH_LONG).show();
                     }
                 } catch (UnsupportedEncodingException e) {
@@ -87,12 +87,12 @@ public class ScrFragment extends Fragment implements View.OnClickListener, Radio
                 break;
 
             case R.id.buttonCheckHealthNInfo:
-                String checkHealth = MainActivity.getPrinterInstance().smartCardCheckHealth();
+                String checkHealth = MainActivityJava.getPrinterInstance().smartCardCheckHealth();
                 if (checkHealth != null) {
                     Toast.makeText(getContext(), checkHealth, Toast.LENGTH_LONG);
                 }
 
-                String info = MainActivity.getPrinterInstance().getSmartCardInfo();
+                String info = MainActivityJava.getPrinterInstance().getSmartCardInfo();
                 if (info != null) {
                     Toast.makeText(getContext(), info, Toast.LENGTH_LONG);
                 }
@@ -127,7 +127,7 @@ public class ScrFragment extends Fragment implements View.OnClickListener, Radio
                 break;
         }
 
-        MainActivity.getPrinterInstance().setSCSlot(slot);
+        MainActivityJava.getPrinterInstance().setSCSlot(slot);
     }
 
     public void setSCMode(int checkedItem) {
@@ -143,7 +143,7 @@ public class ScrFragment extends Fragment implements View.OnClickListener, Radio
 
         // 1 : ISO
         // 2 : EMV
-        MainActivity.getPrinterInstance().setSCMode(mode);
+        MainActivityJava.getPrinterInstance().setSCMode(mode);
     }
 
     public String hexToString(byte[] data) {

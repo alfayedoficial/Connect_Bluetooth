@@ -241,7 +241,7 @@ public class BarcodeFragment extends Fragment implements View.OnClickListener {
                     break;
                 }
 
-                MainActivity.getPrinterInstance().printBarcode(data, symbology, width, height, alignment, Hri);
+                MainActivityJava.getPrinterInstance().printBarcode(data, symbology, width, height, alignment, Hri);
 
                 break;
         }

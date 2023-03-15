@@ -54,8 +54,3 @@ fun <T : Parcelable?> getParcelableExtra(intent: Intent , key: String , m_class:
 }
 
 
-interface PrinterCallback {
-    fun onPrintFinished(result: ResultOfPrint)
-}
-
-data class ResultOfPrint(val result: Boolean, val msg: String)

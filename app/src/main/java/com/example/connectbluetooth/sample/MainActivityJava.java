@@ -17,7 +17,7 @@ import com.example.connectbluetooth.R;
 import com.example.connectbluetooth.sample.PrinterControl.BixolonPrinter;
 import com.google.android.material.tabs.TabLayout;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivityJava extends AppCompatActivity {
     private static BixolonPrinter bxlPrinter = null;
 
     private static Fragment currentFragment;

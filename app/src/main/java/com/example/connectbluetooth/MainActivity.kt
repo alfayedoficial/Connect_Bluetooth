@@ -1,39 +1,32 @@
 package com.example.connectbluetooth
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.media.AudioRecord
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
+import android.text.Layout
 import android.view.View
 import android.widget.Button
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.RecyclerView
-import com.example.connectbluetooth.sample.MainActivity
+import com.example.connectbluetooth.sample.BluetoothUtils
 import com.example.connectbluetooth.sample.PrinterControl.BixolonPrinter
+import com.example.connectbluetooth.sample.createBitmapForShortInvoice
 import kotlinx.coroutines.*
-import java.io.File
-import java.io.IOException
-import java.util.*
 
-class MainActivity : AppCompatActivity()  , PrinterCallback{
+class MainActivity : AppCompatActivity()  , BluetoothUtils.PrinterCallback{
+
+
+    private lateinit var _progressBarDialog : ProgressBar
+    private lateinit var _viewDialog : View
 
     companion object{
         private var BXL_PRINTER: BixolonPrinter? = null
+        var BLUETOOTH_UTILS : BluetoothUtils = BluetoothUtils()
+        @JvmStatic
+        var result : (String?)-> Unit = {_->}
 
         @Synchronized
         fun getPrinterInstance(): BixolonPrinter? {
@@ -45,78 +38,97 @@ class MainActivity : AppCompatActivity()  , PrinterCallback{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_main)
 
+        _progressBarDialog = findViewById(R.id.progressBarDialog)
+        _viewDialog = findViewById(R.id.viewDialog)
+
+
         findViewById<Button>(R.id.buttonConnectBluetooth).setOnClickListener {
             inflateBluetoothDialog()
         }
 
         BXL_PRINTER = BixolonPrinter(applicationContext)
-
-
-        MainScope().launch{
-            delay(1000)
-            startActivity(Intent(this@MainActivity, MainActivity::class.java))
+        BLUETOOTH_UTILS.setActivity(this)
+        BLUETOOTH_UTILS.setPrinterCallbackListener(this)
+        result = {
+            setDeviceLog(it)
         }
+
+//        MainScope().launch{
+//            delay(1000)
+//            startActivity(Intent(this@MainActivity, MainActivityJava::class.java))
+//        }
     }
 
 
     @SuppressLint("MissingPermission")
     private fun inflateBluetoothDialog() {
         ConnectBluetoothFragment.create(
-            action = ConnectBluetoothFragment.Action{ bluetoothDevice ->
-                Toast.makeText(this, "Bluetooth name is ${bluetoothDevice.name?: null}" , Toast.LENGTH_LONG).show()
-                xPrint(bluetoothDevice)
+            action = ConnectBluetoothFragment.Action { bluetoothDevice , logicalName ->
+                Toast.makeText(this, "Bluetooth name is ${bluetoothDevice.name ?: null}", Toast.LENGTH_LONG).show()
+                xPrint(bluetoothDevice , logicalName)
             }
         ).show(supportFragmentManager , "")
     }
 
 
-    fun xPrint(bluetoothDevice: BluetoothDevice) {
+    fun xPrint(bluetoothDevice: BluetoothDevice, logicalName: String) {
+        _viewDialog.visibility = View.VISIBLE
+        _progressBarDialog.visibility = View.VISIBLE
+
         val context = this
         CoroutineScope(Dispatchers.IO).launch {
             val bitmapResult = withContext(CoroutineScope(Dispatchers.Main).coroutineContext) {
-                context.createBitmapForInvoice()
+                context.createBitmapForShortInvoice()
             }
 
+
+
+            when (logicalName) {
+                ConnectBluetoothFragment.PrinterBrand.BIXOLON.value -> {
+                    BXL_PRINTER?.printImage(bitmapResult , 384 , 2 , 50 , 0  ,0 )
+                    //delay(1000)
+//                    BXL_PRINTER?.printerClose()
+                }
+                ConnectBluetoothFragment.PrinterName.SW_6EAD.value -> {
+                    BLUETOOTH_UTILS.printEscCommand(bitmapResult)
+                }
+                else -> {
+                    BLUETOOTH_UTILS.printEscCommand(bitmapResult)
+                }
+            }
         }
     }
 
-    override fun onPrintFinished(result: ResultOfPrint) {
+
+
+
+
+    override fun onPrintFinished(result: BluetoothUtils.ResultOfPrint) {
         MainScope().launch(Dispatchers.Main) {
-            Toast.makeText(this@MainActivity, "result is ${result.msg}" , Toast.LENGTH_LONG).show()
+            _viewDialog.visibility = View.GONE
+            _progressBarDialog.visibility = View.GONE
+
+            Toast.makeText(this@MainActivity, "result is ${result.msg}", Toast.LENGTH_LONG).show()
         }
+
     }
 
-}
 
-private fun Context.createBitmapForInvoice() :Bitmap? = try {
-    val mInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    val mView = RelativeLayout(this)
+    private val mHandler = Handler(Looper.myLooper()!!) { msg ->
+        when (msg.what) {
+            0 -> {
+                _viewDialog.visibility = View.GONE
+                _progressBarDialog.visibility = View.GONE
+                Toast.makeText(this@MainActivity, "result is ${(msg.obj as String).trimIndent()}", Toast.LENGTH_LONG).show()
 
-    mInflater.inflate(R.layout.item_test_print , mView , true)
+            }
+        }
+        false
+    }
 
-    mView.layoutParams = ConstraintLayout.LayoutParams(
-        ConstraintLayout.LayoutParams.MATCH_PARENT,
-        ConstraintLayout.LayoutParams.MATCH_PARENT)
+    fun setDeviceLog(data: String?) {
+        mHandler.obtainMessage(0, 0, 0, data).sendToTarget()
+    }
 
-    //Pre-measure the view so that height and width don't remain null.
-    mView.measure(
-        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-    )
 
-    //Assign a size and position to the view and all of its descendants
-    mView.layout(0, 0, mView.measuredWidth, mView.measuredHeight)
-
-    //Create the bitmap
-    val bitmap = Bitmap.createBitmap(mView.measuredWidth, mView.measuredHeight, Bitmap.Config.ARGB_8888)
-    //Create a canvas with the specified bitmap to draw into
-    val c = Canvas(bitmap)
-
-    //Render this view (and all of its children) to the given Canvas
-    mView.draw(c)
-    //bitmap = resizeImage(bitmap, 576, false);
-    bitmap
-}catch (e :Exception){
-    e.printStackTrace()
-    null
 }

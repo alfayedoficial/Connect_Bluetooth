@@ -12,4 +12,25 @@
     <string name="SCR">SCR</string>
     <string name="CashDrawer">Cash Drawer</string>
     <string name="ETC">Etc.</string>
+
+    <string name="s_tvVersionName">اسم الإصدار : %s</string>
+    <string name="s_tvVersionCode">كود الإصدار : %s</string>
+    <string name="s_tvVersionDate">تاريخ الإصدار : %s</string>
+    <string name="s_tvVersionStatus">حالة الإصدار : %s</string>
+    <string name="un_send_to_server">لم يتم الإرسال إلى السيرفر</string>
+    <string name="request_payment">إخطار بالسداد</string>
+    <string name="s_short_invoice_code">الكود : %s</string>
+    <string name="s_short_invoice_name">السيد : %s</string>
+    <string name="s_short_invoice_total">الإجمالي : %s</string>
+    <string name="s_short_invoice_count">عدد الوحدات : %s</string>
+    <string name="s_short_invoice_bill_count">عدد الفواتير المستحقة : %s</string>
+    <string name="s_short_invoice_total_acult">إجمالى المديونية : %s</string>
+    <string name="s_short_invoice_from_to_date">الفترة من %s إلى %s</string>
+    <string name="s_short_invoice_address">العنوان : %s</string>
+    <string name="short_invoice_address_alart">يرجى التكرم بسرعة سداد المديونية خلال سبعة أيام من تاريخه منعا لإتخاذ الإجراءات القانونية</string>
+    <string name="s_invoce_date">تاريخ الإخطار : %s</string>
+    <string name="invoice_title_water" translatable="false">الشركة القابضة لمياه الشرب و الصرف الصحي</string>
+    <string name="invoice_Commercial" translatable="false">القطاع التجاري</string>
+    <string name="receipt_line_separator" translatable="false">..................................................................</string>
+
 </resources>

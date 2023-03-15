@@ -63,7 +63,7 @@ public class MsrFragment extends Fragment implements View.OnClickListener, Compo
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         switch (compoundButton.getId()) {
             case R.id.checkBoxEvent:
-                MainActivity.getPrinterInstance().setDataEventEnabled(b);
+                MainActivityJava.getPrinterInstance().setDataEventEnabled(b);
 
                 if (b) {
                     buttonGetTrack.setEnabled(false);
@@ -79,35 +79,35 @@ public class MsrFragment extends Fragment implements View.OnClickListener, Compo
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.buttonMsrOpen:
-                if (MainActivity.getPrinterInstance().msrOpen()) {
-                    MainActivity.getPrinterInstance().setDataEventEnabled(checkDataEvent.isChecked());
+                if (MainActivityJava.getPrinterInstance().msrOpen()) {
+                    MainActivityJava.getPrinterInstance().setDataEventEnabled(checkDataEvent.isChecked());
                 }
                 break;
 
             case R.id.buttonGetTrack:
-                String track1 = "Track1 : " + MainActivity.getPrinterInstance().getTrackData(1) + "\n";
-                String track2 = "Track2 : " + MainActivity.getPrinterInstance().getTrackData(2) + "\n";
-                String track3 = "Track3 : " + MainActivity.getPrinterInstance().getTrackData(3) + "\n";
+                String track1 = "Track1 : " + MainActivityJava.getPrinterInstance().getTrackData(1) + "\n";
+                String track2 = "Track2 : " + MainActivityJava.getPrinterInstance().getTrackData(2) + "\n";
+                String track3 = "Track3 : " + MainActivityJava.getPrinterInstance().getTrackData(3) + "\n";
 
                 setDeviceLog(track1 + track2 + track3);
                 break;
 
             case R.id.buttonCheckHealth:
-                String checkHealth = MainActivity.getPrinterInstance().msrCheckHealth();
+                String checkHealth = MainActivityJava.getPrinterInstance().msrCheckHealth();
                 if (checkHealth != null) {
                     Toast.makeText(getContext(), checkHealth, Toast.LENGTH_LONG).show();
                 }
                 break;
 
             case R.id.buttonInfo:
-                String info = MainActivity.getPrinterInstance().getMsrInfo();
+                String info = MainActivityJava.getPrinterInstance().getMsrInfo();
                 if (info != null) {
                     Toast.makeText(getContext(), info, Toast.LENGTH_LONG).show();
                 }
                 break;
 
             case R.id.buttonMsrClose:
-                MainActivity.getPrinterInstance().msrClose();
+                MainActivityJava.getPrinterInstance().msrClose();
                 break;
         }
     }

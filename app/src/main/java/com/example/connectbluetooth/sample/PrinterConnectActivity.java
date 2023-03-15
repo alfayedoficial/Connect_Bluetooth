@@ -306,7 +306,7 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
                         address = editTextIPAddress.getText().toString();
                     }
 
-                    if (MainActivity.getPrinterInstance().printerOpen(portType, logicalName, address, checkBoxAsyncMode.isChecked())) {
+                    if (MainActivityJava.getPrinterInstance().printerOpen(portType, logicalName, address, checkBoxAsyncMode.isChecked())) {
                         finish();
                     } else {
                         mHandler.obtainMessage(1, 0, 0, "Fail to printer open!!").sendToTarget();

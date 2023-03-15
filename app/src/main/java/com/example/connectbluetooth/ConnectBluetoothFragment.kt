@@ -18,12 +18,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bxl.config.editor.BXLConfigLoader
+import com.example.connectbluetooth.sample.BluetoothUtils
 import com.google.android.material.imageview.ShapeableImageView
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 
 
-class ConnectBluetoothFragment : DialogFragment() {
+class ConnectBluetoothFragment : DialogFragment() , BluetoothUtils.OnBluetoothUtilsListener{
 
     private var action : Action = Action.ACTION
 
@@ -41,12 +42,14 @@ class ConnectBluetoothFragment : DialogFragment() {
     private lateinit var _imgClose : ShapeableImageView
     private lateinit var _pbBluetoothSearchForDevices : ShapeableImageView
     private lateinit var _progressBarDialog : ProgressBar
+    private lateinit var _viewDialog : View
 
 
     private lateinit var _mBluetoothAdapter : BluetoothAdapter
     private var _mRegistered = false
     private var _logicalName = ""
     private val _portType = BXLConfigLoader.DEVICE_BUS_BLUETOOTH
+    private var _device: BluetoothDevice? = null
 
 
     companion object{
@@ -74,6 +77,9 @@ class ConnectBluetoothFragment : DialogFragment() {
             BluetoothAdapter.getDefaultAdapter()
         }
 
+        MainActivity.BLUETOOTH_UTILS.setOnBluetoothUtilsListener(this)
+
+
         view.initViews()
         initData()
         clickableActions()
@@ -92,16 +98,19 @@ class ConnectBluetoothFragment : DialogFragment() {
         _rvAvailableDevices = findViewById(R.id.rvBluetoothAvailableDevices)
 
         _progressBarDialog = findViewById(R.id.progressBarDialog)
+        _viewDialog = findViewById(R.id.viewDialog)
 
         _rvPairedDevices.adapter = _adapterPairedDevice
         _rvAvailableDevices.adapter = _adapterAvailableDevice
 
         _adapterPairedDevice.onClickItem = {
+            _viewDialog.visibility = View.VISIBLE
             _progressBarDialog.visibility = View.VISIBLE
             checkTypes(it)
         }
 
         _adapterAvailableDevice.onClickItem = {
+            _viewDialog.visibility = View.VISIBLE
             _progressBarDialog.visibility = View.VISIBLE
             checkTypes(it)
         }
@@ -124,28 +133,61 @@ class ConnectBluetoothFragment : DialogFragment() {
     }
 
 
+    enum class PrinterName(val value : String){
+        MPD31D("MPD31D"),
+        SW_6EAD("SW_6EAD"),
+        SPP200II("SPP-R200II"),
+        SPP200III("SPP-R200III"),
+    }
 
+    enum class PrinterBrand(val value : String){
+        HONEYWELL("Honeywell"),
+        SEWOO("SEWOO"),
+        BIXOLON("Bixolon"),
+    }
+
+    @SuppressLint("MissingPermission")
     private fun checkTypes(device: BluetoothDevice) {
+        _device = device
        MainScope().launch(Dispatchers.IO) {
-           if (_logicalName.isEmpty()){
-               MainScope().launch(Dispatchers.Main) {
-                   _progressBarDialog.visibility = View.GONE
-                   Toast.makeText(context , "Please select a type of printer", Toast.LENGTH_SHORT).show()
-               }
-           }else if (MainActivity.getPrinterInstance()?.printerOpen(_portType, _logicalName, device.address, true) == true){
-               MainScope().launch(Dispatchers.Main) {
-                   _progressBarDialog.visibility = View.GONE
-                   stopDiscovery()
-                   action.action(device)
-                   dismiss()
-               }
-           }else{
-               MainScope().launch(Dispatchers.Main) {
-                   _progressBarDialog.visibility = View.GONE
-                   Toast.makeText(context , "You can't connect printer, please try again.", Toast.LENGTH_SHORT).show()
+           MainActivity.getPrinterInstance()?.printerClose()
+           if ((device.name.contains(PrinterName.SPP200III.value) || device.name.contains(PrinterName.SPP200II.value))){
+               if (_logicalName == PrinterBrand.BIXOLON.value){
+                   if (MainActivity.getPrinterInstance()?.printerOpen(_portType, _logicalName, device.address, true) == true){
+                       MainScope().launch(Dispatchers.Main) {
+                           _viewDialog.visibility = View.GONE
+                           _progressBarDialog.visibility = View.GONE
+                           stopDiscovery()
+                           action.action(device , _logicalName)
+                           dismiss()
+                       }
+                   }
+               }else{
+                  showToastError("Please select [${PrinterBrand.BIXOLON.value}] model of printer and try again.")
                }
            }
+           else if ((device.name.contains(PrinterName.MPD31D.value) || device.name.contains(PrinterName.SW_6EAD.value))){
+               if (_logicalName == PrinterBrand.HONEYWELL.value || _logicalName == PrinterBrand.SEWOO.value) {
+                   MainActivity.BLUETOOTH_UTILS.connectedBluetoothDevice(device)
+               }else{
+                   if (device.name.contains(PrinterName.MPD31D.value)){
+                       showToastError("Please select [${PrinterBrand.HONEYWELL.value}] model of printer and try again.")
+                   }else{
+                       showToastError("Please select [${PrinterBrand.SEWOO.value}] model of printer and try again.")
+                   }
+               }
+           }else{
+               showToastError("You can't connect printer,\n Please select correct model of printer and try again.")
+           }
        }
+    }
+
+    fun showToastError(msg : String){
+        MainScope().launch(Dispatchers.Main) {
+            _viewDialog.visibility = View.GONE
+            _progressBarDialog.visibility = View.GONE
+            Toast.makeText(context , msg, Toast.LENGTH_SHORT).show()
+        }
     }
 
 
@@ -154,8 +196,6 @@ class ConnectBluetoothFragment : DialogFragment() {
         _imgClose.setOnClickListener {dismiss()}
         _switchEnableBluetooth.setOnCheckedChangeListener { _, isChecked -> setBluetooth(isChecked)  }
         _pbBluetoothSearchForDevices.setOnClickListener { searchAvailableBluetoothDevices() }
-
-
     }
 
     @SuppressLint("MissingPermission")
@@ -321,9 +361,9 @@ class ConnectBluetoothFragment : DialogFragment() {
 
     }
 
-    data class Action(var action:(BluetoothDevice)->Unit){
+    data class Action(var action:(BluetoothDevice , String)->Unit){
         companion object{
-            val ACTION = Action{}
+            val ACTION = Action{_ , _ ->}
         }
     }
 
@@ -336,5 +376,19 @@ class ConnectBluetoothFragment : DialogFragment() {
         super.onDismiss(dialog)
         stopDiscovery()
     }
+
+    override fun onBluetoothUtilsListener(enable: Boolean) {
+        MainScope().launch(Dispatchers.Main) {
+                _progressBarDialog.visibility = View.GONE
+                _viewDialog.visibility = View.GONE
+            if (enable){
+                action.action(_device!! , _logicalName)
+                dismiss()
+            }else{
+                Toast.makeText(context , "You can't connect printer, please try again.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
 }

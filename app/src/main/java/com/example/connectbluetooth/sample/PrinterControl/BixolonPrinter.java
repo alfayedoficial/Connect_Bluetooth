@@ -4,17 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 
-import androidx.fragment.app.Fragment;
-
-import com.example.connectbluetooth.sample.BarcodeFragment;
-import com.example.connectbluetooth.sample.CashDrawerFragment;
-import com.example.connectbluetooth.sample.DirectIOFragment;
-import com.example.connectbluetooth.sample.ImageFragment;
-import com.example.connectbluetooth.sample.MainActivity;
-import com.example.connectbluetooth.sample.MsrFragment;
-import com.example.connectbluetooth.sample.PageModeFragment;
-import com.example.connectbluetooth.sample.TextFragment;
 import com.bxl.config.editor.BXLConfigLoader;
+import com.example.connectbluetooth.MainActivity;
 
 import java.nio.ByteBuffer;
 
@@ -133,6 +124,8 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     private int mPortType;
     private String mAddress;
 
+    public BixolonPrinter(){}
+
     public BixolonPrinter(Context context) {
         this.context = context;
 
@@ -180,6 +173,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
                     } catch (JposException e1) {
                         e1.printStackTrace();
                     }
+                    return false;
                 }
             }
         }
@@ -1652,6 +1646,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
     @Override
     public void outputCompleteOccurred(OutputCompleteEvent outputCompleteEvent) {
+        MainActivity.Companion.getResult().invoke( "outputComplete : " + outputCompleteEvent.getOutputID());
 //        Fragment fm = MainActivity.getVisibleFragment();
 //        if (fm != null) {
 //            if (fm instanceof TextFragment) {

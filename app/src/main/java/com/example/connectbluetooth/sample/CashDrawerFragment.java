@@ -52,25 +52,25 @@ public class CashDrawerFragment extends Fragment implements View.OnClickListener
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.buttonCashDrawerOpen:
-                MainActivity.getPrinterInstance().cashDrawerOpen();
+                MainActivityJava.getPrinterInstance().cashDrawerOpen();
                 break;
             case R.id.buttonDrawerOpen:
-                MainActivity.getPrinterInstance().drawerOpen();
+                MainActivityJava.getPrinterInstance().drawerOpen();
                 break;
             case R.id.buttonCheckHealth:
-                String checkHealth = MainActivity.getPrinterInstance().cashDrawerCheckHealth();
+                String checkHealth = MainActivityJava.getPrinterInstance().cashDrawerCheckHealth();
                 if (checkHealth != null) {
                     Toast.makeText(getContext(), checkHealth, Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.buttonInfo:
-                String info = MainActivity.getPrinterInstance().getCashDrawerInfo();
+                String info = MainActivityJava.getPrinterInstance().getCashDrawerInfo();
                 if (info != null) {
                     Toast.makeText(getContext(), info, Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.buttonCashDrawerClose:
-                MainActivity.getPrinterInstance().cashDrawerClose();
+                MainActivityJava.getPrinterInstance().cashDrawerClose();
                 break;
         }
     }
