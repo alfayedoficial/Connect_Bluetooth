@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity()  , PrinterCallback{
     private var isRecording = false
     private var mAudioRecord: AudioRecord? = null
     private var mPlayer: MediaPlayer? = null
-    private var mWaveWriter: WaveWriter? = null
     private var mBufferSize = 0
 
     private val itemList = ArrayList<MyItem>()
@@ -80,47 +79,6 @@ class MainActivity : AppCompatActivity()  , PrinterCallback{
             }
         }
         addRandomTimeList()
-        mBufferSize = AudioRecord.getMinBufferSize(44100, 16, 2)
-
-        tvCounterRecord1 = findViewById(R.id.tvCounterRecord1)
-        btnRecord = findViewById(R.id.buttonRecord)
-        buttonStopSound = findViewById(R.id.buttonStopSound)
-        buttonPlay = findViewById(R.id.buttonPlay)
-        buttonStop = findViewById(R.id.buttonStop)
-        btnRecord.setOnClickListener {
-            if (!isRecording) {
-                isRecording = true
-                currentTime = 0
-                tvCounterRecord1.text = "00:00"
-                displayTime()
-                startAudioRecording()
-            }
-
-        }
-
-        buttonStop.setOnClickListener {
-            stopRecord()
-        }
-        buttonPlay.setOnClickListener {
-            if (PlayerServiceUtil.isPlaying()) {
-                PlayerServiceUtil.pause(PauseReason.NONE)
-            }
-            if (PlayerActivity.mMediaPlayer != null) {
-                if (PlayerActivity.mMediaPlayer.isPlaying()) {
-                    PlayerActivity.mMediaPlayer.pause()
-                }
-            }
-            if (!isPlaying) {
-                startAudioPlaying()
-                return
-            } else {
-                pauseAudioPlaying()
-                return
-            }
-        }
-        buttonStopSound.setOnClickListener {
-            stopRecord()
-        }
 
 //        MainScope().launch{
 //            delay(1000)
@@ -128,71 +86,8 @@ class MainActivity : AppCompatActivity()  , PrinterCallback{
 //        }
     }
 
-    private fun getFilename(): String? {
-        val file: File = MyUtils.ChangeVoiceLocation
-        if (!file.exists()) {
-            file.mkdirs()
-        }
-        return file.absolutePath + "/record.wav"
-    }
-    @SuppressLint("MissingPermission")
-    private fun startAudioRecording() {
-        if (mBufferSize <= 0) {
-            stopRecord()
-            return
-        }
-        deleteMainFile()
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            return
-        }
-        mAudioRecord = AudioRecord(1, 44100, 16, 2, mBufferSize)
-        mFileName = getFilename()
-        mWaveWriter =
-            WaveWriter(File(mFileName), 44100, 1, 16)
-        try {
-            mWaveWriter?.createWaveFile()
-        } catch (exception: IOException) {
-            exception.printStackTrace()
-        }
-        if (mAudioRecord!!.state == 1) {
-            mAudioRecord!!.startRecording()
-            mRecordingThread = Thread { writeAudioDataToFile() }
-            mRecordingThread!!.start()
-            return
-        }
-        Toast.makeText(this , "Error" , Toast.LENGTH_SHORT).show()
-        stopRecord()
-    }
 
-    private fun writeAudioDataToFile() {
-        val sArr = ShortArray(8192)
-        if (mWaveWriter != null) {
-            while (isRecording) {
-                val read = mAudioRecord!!.read(sArr, 0, 8192)
-                if (-3 != read) {
-                    try {
-                        mWaveWriter!!.write(sArr, 0, read)
-                    } catch (exception: IOException) {
-                        exception.printStackTrace()
-                    }
-                }
-            }
-        }
-    }
 
-    fun isEmptyString(str: String?): Boolean {
-        return str == null || str == ""
-    }
-
-    private fun deleteMainFile() {
-        if (!isEmptyString(mFileName)) {
-            try {
-                File(mFileName).delete()
-            } catch (exception: java.lang.Exception) {
-                exception.printStackTrace()
-            }
-        }
-    }
 
 
     private fun addRandomTimeList() {
@@ -243,72 +138,6 @@ class MainActivity : AppCompatActivity()  , PrinterCallback{
         MainScope().launch(Dispatchers.Main) {
             Toast.makeText(this@MainActivity, "result is ${result.msg}" , Toast.LENGTH_LONG).show()
         }
-    }
-
-    fun displayTime() {
-        mHandler.postDelayed(java.lang.Runnable {
-            if (currentTime < 60000) {
-                currentTime += 1000
-                var valueOf: String = (currentTime / 1000 / 60).toString()
-                var valueOf2: String = (currentTime / 1000 % 60).toString()
-                if (valueOf.length == 1) {
-                    valueOf = "0$valueOf"
-                }
-                if (valueOf2.length == 1) {
-                    valueOf2 = "0$valueOf2"
-                }
-                tvCounterRecord1.text = "$valueOf:$valueOf2"
-                displayTime()
-                return@Runnable
-            }
-            stopRecord()
-        }, 1000)
-    }
-
-    fun stopRecord() {
-        if (isRecording) {
-            mHandler.removeCallbacksAndMessages(null as Any?)
-            isRecording = false
-            stopAudioRecording(true)
-        }
-    }
-
-    fun stopAudioRecording(b: Boolean) {
-        if (mAudioRecord != null) {
-            try {
-                if (mRecordingThread != null) {
-                    mRecordingThread!!.interrupt()
-                    mRecordingThread = null
-                }
-                mAudioRecord?.stop()
-                mAudioRecord?.release()
-                mAudioRecord = null
-                try {
-                    mWaveWriter?.closeWaveFile()
-                } catch (exception: IOException) {
-                    exception.printStackTrace()
-                }
-            } catch (exception2: java.lang.Exception) {
-                exception2.printStackTrace()
-            }
-        }
-    }
-    private fun pauseAudioPlaying() {
-        var mediaPlayer: MediaPlayer ? = null
-        if (isPlaying && mPlayer?.also { mediaPlayer = it } != null  && mediaPlayer?.isPlaying == true) {
-            mPlayer?.pause()
-            isPlaying = false
-            btnRecord.text = "Record"
-        }
-    }
-
-
-    fun stopAudioPlaying() {
-        if (mPlayer != null) {
-            mPlayer?.release()
-            mPlayer = null
-        }
-        isPlaying = false
     }
 
 }
